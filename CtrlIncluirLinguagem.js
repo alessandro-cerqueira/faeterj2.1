@@ -6,8 +6,12 @@ const INICIAR_INCLUIR_LINGUAGEM = "/iniciarIncluirLinguagem";
 const INCLUIR_LINGUAGEM = "/incluirLinguagem";
 const OPERACAO = "Incluir";
 
+var servidor;
+
 module.exports = {
-  configurar: async(servidor) => {
+  configurar: async(srv) => {
+    servidor = srv;
+    
     // Apresenta o formulário caso o path seja / e requisição via get
     servidor.get(INICIAR_INCLUIR_LINGUAGEM, module.exports.apresentarFormulario);
 
@@ -19,6 +23,14 @@ module.exports = {
     // (Search Engine Optimization) que coloca dados nas tags META do arquivo hbs
     let params = request.query.raw ? {} : { seo: seo };
 
+    // Verificando se ocorreu a autenticação
+    let conta = request.cookies.conta;
+    if(conta == null || conta == undefined) {
+      params.error = "Usuário não autenticado!";
+      reply.view("/src/pages/login.hbs", params);
+      return;
+    }
+    
     params.operacao = OPERACAO;
     params.funcao = INCLUIR_LINGUAGEM;
     

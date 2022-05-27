@@ -1,5 +1,6 @@
 'use strict'
 
+
 // Para especificações de path 
 const path = require("path");
  
@@ -19,6 +20,11 @@ servidor.register(require("fastify-static"), {
 // Configurando o Fastify para processar o input de dados vindos de formulários
 servidor.register(require("fastify-formbody"));
 
+// Configurando o Fastify para usar cookies
+servidor.register(require('fastify-cookie'), {
+  secret: "paracambi", // for cookies signature
+  parseOptions: {}     // options for parsing cookies
+});
 
 const hbs = require("handlebars");
 // Registrando o template manager Point-of-View
@@ -28,31 +34,14 @@ servidor.register(require("point-of-view"), {
   }
 });
 
-hbs.registerHelper('nomes', function (votos) {
-  let tamanho = votos.length;
-  let resultado = [];
-  for(let i = 0; i < tamanho; i++)
-    resultado.push(votos[i].nome);
-  return resultado;
-});
-
-hbs.registerHelper('totais', function (votos) {
-  let tamanho = votos.length;
-  let resultado = [];
-  for(let i = 0; i < tamanho; i++)
-    resultado.push(votos[i].numVotos);
-  
-  return resultado;
-});
-
 //
-// Carga dinâmica dos controladores de Caso de Uso (Injeção de Dependência)
+// Criando Helpers (TAGS) que possam ser utilizados nas páginas
 //
-let nomesCtrl = process.env.CONTROLADORES.split(","); 
-console.log(nomesCtrl);
-for(let i = 0; i < nomesCtrl.length; i++) {
-  let ctrl = require("./" + nomesCtrl[i] + ".js");
-  ctrl.configurar(servidor);
+let nomesHelpers = process.env.HELPERS.split(","); 
+console.log(nomesHelpers);
+for(let i = 0; i < nomesHelpers.length; i++) {
+  let helper = require("./src/helpers/" + nomesHelpers[i] + ".js");
+  helper.configurar(hbs);
 }
 
 //
@@ -66,7 +55,24 @@ for(let i = 0; i < nomesPartials.length; i++) {
   hbs.registerPartial(nome, fs.readFileSync(path.join(__dirname, 'src', 'pages', nome+'.hbs'), 'utf8'));
 }
 
-// Colocando o servidor no ar 
+//
+// Carga dinâmica dos controladores de Caso de Uso (Injeção de Dependência)
+//
+let nomesCtrl = process.env.CONTROLADORES.split(","); 
+console.log(nomesCtrl);
+for(let i = 0; i < nomesCtrl.length; i++) {
+  let ctrl = require("./" + nomesCtrl[i] + ".js");
+  ctrl.configurar(servidor);
+}
+
+//
+// Definindo os usuários ativos
+//
+servidor.usuariosAtivos = [];
+
+//
+// Colocando o servidor no ar  
+//
 servidor.listen(process.env.PORT, '0.0.0.0', function(err, address) {
   if (err) {
     servidor.log.error(err);

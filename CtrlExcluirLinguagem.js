@@ -6,8 +6,13 @@ const INICIAR_EXCLUIR_LINGUAGEM = "/iniciarExcluirLinguagem";
 const EXCLUIR_LINGUAGEM = "/excluirLinguagem";
 const OPERACAO = "Excluir";
 
+var servidor;
+
 module.exports = {
-  configurar: async(servidor) => {
+  configurar: async(srv) => {
+    
+    servidor = srv;
+    
     // Apresenta o formulário caso o path seja / e requisição via get
     servidor.get(INICIAR_EXCLUIR_LINGUAGEM, module.exports.apresentarFormulario);
 
@@ -18,6 +23,14 @@ module.exports = {
     // Se a requisição NÃO veio com o parâmetro 'raw', vamos repassar o objeto SEO
     // (Search Engine Optimization) que coloca dados nas tags META do arquivo hbs
     let params = request.query.raw ? {} : { seo: seo };
+
+      // Verificando se ocorreu a autenticação
+    let conta = request.cookies.conta;
+    if(conta == null || conta == undefined) {
+      params.error = "Usuário não autenticado!";
+      reply.view("/src/pages/login.hbs", params);
+      return;
+    }
 
     params.operacao = OPERACAO;
     params.funcao = EXCLUIR_LINGUAGEM;

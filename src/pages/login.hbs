@@ -6,7 +6,7 @@
   <link rel="icon" href="https://glitch.com/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Alô SQLite: {{operacao}} Linguagem</title>
+  <title>Alô SQLite: Login</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 
@@ -14,24 +14,23 @@
   <div class="wrapper">
     <div class="content" role="main">
       {{>cabecalho}}
-      <h1>{{operacao}}Linguagem</h1>
+      <h1>Efetuar Login</h1>
 {{#if error}}
       <p class="error">
         {{error}}
       </p>
-{{else}}
-      <!-- O usuário pode limpar a lista de votos se ele primeiramente determinar a ADMIN_KEY presente no .env-->
-      <form action="{{funcao}}" method="post">
-        <h3>
-          {{operacao}} linguagem na votação
-        </h3>
-        <input type="text" id="nome" name="nome" required>
-        <button type="submit">{{operacao}}</button>
-      </form>
 {{/if}}
+      <!-- O usuário pode limpar a lista de votos se ele primeiramente determinar a ADMIN_KEY presente no .env-->
+      <form action="/" method="post">
+        <h3>
+          Efetue seu login
+        </h3>
+        <label for="conta">Conta: </label><input type="text" id="conta" name="conta" required><br/>
+        <label for="senha">Senha: </label><input type="password" id="senha" name="senha" required><br/>
+        <button type="submit">Submeter</button>
+      </form>
     </div>
   </div>
-  {{>rodape}}
 </body>
 
 </html>

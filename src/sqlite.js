@@ -28,9 +28,9 @@ sqlite.open({ filename: dbFile, driver: sqlite3.Database})
           "INSERT INTO Linguagem (nome, numVotos) VALUES ('Python', 0), ('JavaScript', 0), ('Java', 0), ('C#', 0)"
         );
 
-        // Criando a tabela Log
+        // Criando a tabela Voto
         await db.run(
-          "CREATE TABLE Log (id INTEGER PRIMARY KEY AUTOINCREMENT, hora STRING, idLinguagem INTEGER, FOREIGN KEY (idLinguagem) REFERENCES Linguagem(id))"
+          "CREATE TABLE Voto(id INTEGER PRIMARY KEY AUTOINCREMENT, hora STRING, idLinguagem INTEGER, FOREIGN KEY (idLinguagem) REFERENCES Linguagem(id))"
         );
       } else {
         // Se já temos um banco de dados, lista os votos processados
@@ -44,7 +44,7 @@ sqlite.open({ filename: dbFile, driver: sqlite3.Database})
 module.exports = {
 // Funções disponibilizadas pela exportação
   //--- Retorna o resultado atual da votação ---//
-  obterVotos: async () => {
+  obterLinguagens: async () => {
     try {
       return await db.all("SELECT * from Linguagem");
     } catch (dbError) {
@@ -58,7 +58,7 @@ module.exports = {
       // verificando se o voto é válido
       const resultado = await db.all("SELECT * from Linguagem WHERE id = ?", votoLinguagem);
       if (resultado.length > 0) {
-        await db.run("INSERT INTO Log (idLinguagem, hora) VALUES (?, ?)", 
+        await db.run("INSERT INTO Voto (idLinguagem, hora) VALUES (?, ?)", 
                      [votoLinguagem, new Date().toISOString()]);
         await db.run(
           "UPDATE Linguagem SET numVotos = numVotos + 1 WHERE id = ?", votoLinguagem);
@@ -70,20 +70,20 @@ module.exports = {
     }
   },
 
-  //--- Retorna os últimos logs da votação  ---//
-  obterLogs: async () => {
-    // Retorna os 30 logs mais recentes
+  //--- Retorna os últimos votos   ---//
+  obterVotos: async () => {
+    // Retorna os 30 votos mais recentes
     try {
-      return await db.all("SELECT l.id, l.hora, l.idLinguagem, v.nome from Log l INNER JOIN Linguagem v ON l.idLinguagem = v.id ORDER BY hora DESC LIMIT 30");
+      return await db.all("SELECT l.id, v.hora, v.idLinguagem, l.nome from Linguagem l INNER JOIN Voto v ON v.idLinguagem = l.id ORDER BY v.hora DESC LIMIT 30");
     } catch (dbError) {
       console.error(dbError);
     }
   },
 
-  //--- Limpa os logs e reset os votos ---//
-  limparLogs: async () => {
+  //--- Limpa e reset os votos ---//
+  limparVotos: async () => {
     try {
-      await db.run("DELETE FROM Log");
+      await db.run("DELETE FROM Voto");
       await db.run("DELETE FROM Linguagem");
       await db.run("INSERT INTO Linguagem (nome, numVotos) VALUES ('Python', 0), ('JavaScript', 0), ('Java', 0), ('C#', 0)");
 

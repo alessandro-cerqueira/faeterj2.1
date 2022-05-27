@@ -2,8 +2,11 @@ const seo = require("./src/seo.json");
 const data = require("./src/data.json");
 const db = require("./src/" + data.database);
 
+var servidor;
+
 module.exports = {
-  configurar: async(servidor) => {
+  configurar: async(srv) => {
+    servidor = srv;
     // Resseta a votação caso o path seja /reset e a requisição seja post
     servidor.post("/reset", module.exports.reiniciarVotacao );
   },
@@ -11,6 +14,14 @@ module.exports = {
     // Se a requisição NÃO veio com o parâmetro 'raw', vamos repassar o objeto SEO
     // (Search Engine Optimization) que coloca dados nas tags META do arquivo hbs
     let params = request.query.raw ? {} : { seo: seo };
+    
+    // Verificando se ocorreu a autenticação
+    let conta = request.cookies.conta;
+    if(conta == null || conta == undefined) {
+      params.error = "Usuário não autenticado!";
+      reply.view("/src/pages/login.hbs", params);
+      return;
+    }
 
     // Verificando se a autenticação foi realizada corretamente. 'process' é um
     // objeto que provê informações e controle sobre a execução do processo Node.js
@@ -25,14 +36,14 @@ module.exports = {
       // Define a mensagem de falha na autenticação
       params.falha = "As credenciais enviadas são inválidas!";
 
-      // Obtem a lista de logs
-      params.logs = await db.obterLogs();
+      // Obtem a lista de votos
+      params.votos = await db.obterVotos();
     } else {
-      // Solicita a limpeza dos logs.
-      params.logs = await db.limparLogs();
+      // Solicita a limpeza dos votos.
+      params.votos = await db.limparVotos();
 
       // Define a mensagem de erro, caso não tenha realizado a ação de limpeza com sucesso
-      params.error = params.logs ? null : data.errorMessage;
+      params.error = params.votos ? null : data.errorMessage;
     }
 
     // Envia o status 401 se a autenticação falhou. Se não, envia 200
