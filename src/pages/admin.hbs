@@ -6,7 +6,7 @@
   <link rel="icon" href="https://glitch.com/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Alô SQLite: Logs</title>
+  <title>Alô SQLite: Log dos Votos</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 
@@ -14,19 +14,19 @@
   <div class="wrapper">
     <div class="content" role="main">
       {{>cabecalho}}
-      <h1>Logs</h1>
+      <h1>Votos</h1>
       {{#if error}}
       <p class="error">
         {{error}}
       </p>
       {{else}}
 
-      <!-- O script do servidor irá retornar os logs no array  -->
+      <!-- O script do servidor irá retornar os votos no array  -->
       <p>
         Cada vez que você submete um voto na <a href="/">Home Page</a>, a aplicação irá também adicionar um log. <em>Apresentando os registros mais recentes (max 30).</em>
       </p>
       <!-- Write out a table row for each entry in the log array showing choice and timestamp -->
-      {{#if logs.length}}
+      {{#if votos.length}}
           <div>
             <h2>Histórico da Votação</h2>
             <table>
@@ -34,7 +34,7 @@
                 <th>Linguagem</th>
                 <th>Hora</th>
               </tr>
-              {{#each logs}}
+              {{#each votos}}
                 <tr>
                   <td>{{nome}}</td>
                   <td>{{hora}}</td>
@@ -48,7 +48,7 @@
       </p>
       {{/if}}
 
-      <!-- O usuário pode limpar a lista de logs se ele primeiramente determinar a ADMIN_KEY presente no .env-->
+      <!-- O usuário pode limpar a lista de votos se ele primeiramente determinar a ADMIN_KEY presente no .env-->
       <form action="/reset" method="post">
         <h2>
           Limpando o histórico da votação
@@ -69,7 +69,7 @@
         </p>
         {{/if}}
         <input type="password" id="pass" name="key" required>
-        <button type="submit">Clear log history</button>
+        <button type="submit">Limpar Votos</button>
       </form>
       {{/if}}
     </div>
