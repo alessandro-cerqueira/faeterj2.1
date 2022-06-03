@@ -23,7 +23,7 @@ module.exports = {
     let conta = request.cookies.conta;
     console.log("--->" + JSON.stringify(request.cookies));
     if(conta == null || conta == undefined) {
-      params.error = "Usuário não autenticado!";
+      params.error = "* Usuário não autenticado!";
       reply.view("/src/pages/login.hbs", params);
       return;
     }
@@ -41,9 +41,6 @@ module.exports = {
     }
     // Se não obteve as linguagens, repassar a mensagem de erro.
     else params.error = data.msgErro;
-
-    // Para especificações de path 
-    // const dao = require("./DaoLinguagem.js"); 
 
     // Se a requisição veio com o parâmetro 'raw', devolvo o JSON com o conteúdo dos votos.
     // Se não, solicito a renderização da página index.hbs

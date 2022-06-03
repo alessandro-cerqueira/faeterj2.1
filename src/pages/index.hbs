@@ -116,7 +116,7 @@
           Qual das linguagens abaixo você mais gosta de codificar? 
         </p>
         <!-- Envia para o servidor via POST quando o usuário submete uma opção -->
-        <form method="post" action="/">
+        <form method="post" action="/votacao">
           <!-- O servidor retorna a lista de linguagens presentes na votação -->
     {{#each linguagens}}
           <input type="radio" id="{{this.nome}}" name="idLinguagem" value="{{this.id}}" required />
